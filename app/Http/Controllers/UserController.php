@@ -32,7 +32,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        // Future logic to show a form for creating a new user
+        return Inertia::render('Users/Create');
     }
 
     /**
@@ -40,7 +40,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Future logic to save a new user to the database
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        //crearea util
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password), // criptam
+        ]);
+
+        // il trimitem inapoi
+        return redirect()->route('users.index');
     }
 
     /**
@@ -56,7 +70,11 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        // Future logic to show a form for editing an existing user
+        $user = User::findOrFail($id); // Găsim utilizatorul
+
+        return Inertia::render('Users/Edit', [
+            'user' => $user // Îl trimitem la formular
+        ]);
     }
 
     /**
@@ -64,7 +82,30 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Future logic to update an existing user's details and roles
+        $user = User::findOrFail($id);
+
+        // 1. Verificăm datele. Atenție la șmecheria de la email!
+        // Îi spunem să verifice dacă emailul e unic, DAR să ignore emailul actual al acestui utilizator.
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8', // nullable = poate fi lăsat gol!
+        ]);
+
+        // 2. Schimbăm numele și emailul
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        // 3. Schimbăm parola DOAR dacă a scris ceva în căsuță
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        // 4. Salvăm totul
+        $user->save();
+
+        // 5. Ne întoarcem la tabel
+        return redirect()->route('users.index');
     }
 
     /**
@@ -72,6 +113,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        // Future logic to delete a user from the database
+        $user=User::findOrFail($id);
+        $user->delete();
+        return redirect()->back();
     }
 }
