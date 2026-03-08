@@ -53,7 +53,7 @@ class UserController extends Controller
             'password' => bcrypt($request->password), // criptam
         ]);
 
-        // il trimitem inapoi
+        
         return redirect()->route('users.index');
     }
 
@@ -84,27 +84,26 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // 1. Verificăm datele. Atenție la șmecheria de la email!
-        // Îi spunem să verifice dacă emailul e unic, DAR să ignore emailul actual al acestui utilizator.
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8', // nullable = poate fi lăsat gol!
+            'password' => 'nullable|string|min:8', 
         ]);
 
-        // 2. Schimbăm numele și emailul
+        
         $user->name = $request->name;
         $user->email = $request->email;
 
-        // 3. Schimbăm parola DOAR dacă a scris ceva în căsuță
+        
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
 
-        // 4. Salvăm totul
+        
         $user->save();
 
-        // 5. Ne întoarcem la tabel
+        
         return redirect()->route('users.index');
     }
 
