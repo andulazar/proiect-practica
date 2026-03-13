@@ -1,5 +1,9 @@
+
 import { Head, router, Link } from '@inertiajs/react';
-import React from 'react';
+import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+
 
 interface Role {
     id: number;
@@ -16,11 +20,20 @@ interface User {
 interface IndexProps {
     users: User[];
 }
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
+];
 
 export default function Index({ users }: IndexProps) {
     return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+                    <Head title="Manage Users" />
+                    
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-            <Head title="Manage Users" />
+            
             
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
@@ -86,5 +99,6 @@ export default function Index({ users }: IndexProps) {
                 </table>
             </div>
         </div>
+    </AppLayout>
     );
 }

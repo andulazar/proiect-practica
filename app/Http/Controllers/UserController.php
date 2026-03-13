@@ -32,7 +32,12 @@ class UserController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Users/Create');
+        $roles = Role::all();
+        
+        
+        return Inertia::render('Users/Create', [
+            'roles' => $roles
+        ]);
     }
 
     /**
@@ -47,13 +52,13 @@ class UserController extends Controller
         ]);
 
         //crearea util
-        User::create([
+        $user=User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password), // criptam
         ]);
 
-        
+        $user->assignRole($request->role);
         return redirect()->route('users.index');
     }
 
@@ -70,10 +75,14 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $user = User::findOrFail($id); // Găsim utilizatorul
+        $user = User::with('roles')->findOrFail($id); 
+        
+        // 2. Luăm toate rolurile posibile pentru lista derulantă
+        $roles = Role::all(); 
 
         return Inertia::render('Users/Edit', [
-            'user' => $user // Îl trimitem la formular
+            'user' => $user,
+            'roles' => $roles
         ]);
     }
 
@@ -82,28 +91,28 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $user = User::findOrFail($id);
+       $user = User::findOrFail($id);
 
-        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8', 
+            'role' => 'required|string|exists:roles,name', 
         ]);
 
         
         $user->name = $request->name;
         $user->email = $request->email;
 
-        
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
 
-        
         $user->save();
 
         
+        $user->syncRoles([$request->role]);
+
         return redirect()->route('users.index');
     }
 
