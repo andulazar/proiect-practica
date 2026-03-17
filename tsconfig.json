@@ -113,5 +113,5 @@
         },
         "jsx": "react-jsx"
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.tsx", "resources/js/pages/Users/Create.jsx", "resources/js/pages/Users/Edit.jsx"]
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.tsx", "resources/js/pages/Users/Create.tsx", "resources/js/pages/Users/Edit.tsx"]
 }
