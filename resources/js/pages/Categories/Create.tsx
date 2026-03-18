@@ -10,7 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Create() {
-    // Aici pregătim toate căsuțele cerute de tine
+    
     const { data, setData, post, errors, processing } = useForm({
         title: '',
         slug: '',
@@ -52,7 +52,7 @@ export default function Create() {
 
                                 <div>
                                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">Slug</label>
-                                    <input type="text" value={data.slug} onChange={e => setData('slug', e.target.value)} placeholder="Ex: masini-sport (lasă gol pentru auto-generare)" className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
+                                    <input type="text" value={data.slug} onChange={e => setData('slug', e.target.value)} placeholder="Ex: cars-sport" className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
                                     {errors.slug && <div className="text-red-500 text-sm mt-1">{errors.slug}</div>}
                                 </div>
                             </div>

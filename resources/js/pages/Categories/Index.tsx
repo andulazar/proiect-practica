@@ -96,7 +96,7 @@ export default function Index({ categories }: IndexProps) {
 
                                                 <button 
                                                     onClick={() => {
-                                                        if (window.confirm('Sigur vrei să ștergi această categorie?')) {
+                                                        if (window.confirm('Are you sure?')) {
                                                             router.delete(`/categories/${category.id}`);
                                                         }
                                                     }}
