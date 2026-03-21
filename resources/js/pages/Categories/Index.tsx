@@ -69,7 +69,7 @@ export default function Index({ categories }: IndexProps) {
 
                                 
                                 {categories.map((category) => (
-                                    <tr key={category.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750">
+                                    <tr key={category.id} className="border-b dark:border-gray-700 hover:bg-gray-600 dark:hover:bg-gray-750">
                                         <td className="p-4 text-gray-800 dark:text-gray-300">{category.id}</td>
                                         <td className="p-4 text-gray-800 dark:text-gray-300 font-medium">{category.title}</td>
                                         <td className="p-4 text-gray-500 dark:text-gray-400">/{category.slug}</td>

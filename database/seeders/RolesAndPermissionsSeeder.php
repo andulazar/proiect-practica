@@ -16,17 +16,43 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         
-        Permission::firstOrCreate(['name' => 'manage users']);
-        Permission::firstOrCreate(['name' => 'create posts']);
-        Permission::firstOrCreate(['name' => 'edit posts']);
-        Permission::firstOrCreate(['name' => 'delete posts']);
+        $permissions = [
+            
+            'view categories',
+            'create categories',
+            'edit categories',
+            'delete categories',
 
-        Role::firstOrCreate(['name' => 'User']);
+            'view posts',
+            'create posts',
+            'edit posts',
+            'delete posts',
+            'publish posts', 
 
-        $editorRole = Role::firstOrCreate(['name' => 'Editor']);
-        $editorRole->givePermissionTo(['create posts', 'edit posts']);
+            
+            'manage users',
+            'manage roles',
+        ];
 
-        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+        
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
+
+        
+        $adminRole = Role::create(['name' => 'Admin']);
         $adminRole->givePermissionTo(Permission::all());
+
+        
+        $editorRole = Role::create(['name' => 'Editor']);
+        $editorRole->givePermissionTo([
+            'view categories',
+            'view posts',
+            'create posts',
+            'edit posts'
+        ]);
+        
+        
+        Role::create(['name' => 'User']);
     }
 }

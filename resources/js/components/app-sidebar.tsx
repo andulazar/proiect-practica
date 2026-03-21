@@ -1,9 +1,10 @@
-import { Link } from '@inertiajs/react';
+import { Link , usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 //import { index } from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+
 
 import {
     Sidebar,
@@ -19,23 +20,7 @@ import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 
 
-const mainNavItems: NavItem[] = [
-    {       
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {       
-        title: 'Users',
-        href: '/users',
-        icon: LayoutGrid,
-    },
-     {       
-        title: 'Categories',
-        href: '/categories',
-        icon: Folder,
-    },
-];
+
 
 const footerNavItems: NavItem[] = [
     {
@@ -51,8 +36,50 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+        const { auth } = usePage<{ 
+                auth: { 
+                    user: { permissions?: string[] } | null 
+                } 
+            }>().props;    
+        const userPermissions = auth.user?.permissions || [];
+
+    
+    const mainNavItems: NavItem[] = [
+        {       
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+    ];
+
+    
+    if (userPermissions.includes('manage users')) {
+        mainNavItems.push({       
+            title: 'Users',
+            href: '/users',
+            icon: LayoutGrid,
+        });
+    }
+
+    if (userPermissions.includes('view categories')) {
+        mainNavItems.push({       
+            title: 'Categories',
+            href: '/categories',
+            icon: Folder,
+        });
+    }
+
+    if (userPermissions.includes('manage roles')) {
+        mainNavItems.push({       
+            title: 'Roles & Permissions',
+            href: '/roles',
+            icon: LayoutGrid,
+        });
+    }
+
     return (
         <Sidebar collapsible="icon" variant="inset">
+            
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

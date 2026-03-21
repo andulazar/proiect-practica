@@ -16,10 +16,10 @@ export default function Create() {
         slug: '',
         description: '',
         is_active: true,
-        template: '',
+        template: 'default',
         meta_descriptions: '',
         keywords: '',
-        robots: '',
+        robots: 'index, follow',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -65,8 +65,17 @@ export default function Create() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">Template</label>
-                                    <input type="text" value={data.template} onChange={e => setData('template', e.target.value)} className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
+                                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">Template</label>
+                                        <select 
+                                            value={data.template} 
+                                            onChange={e => setData('template', e.target.value)}
+                                            className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border"
+                                        >
+                                            <option value="default">Default</option>
+                                            <option value="grid">Grid </option>
+                                            <option value="list">List </option>
+                                            <option value="full-width">Full Width </option>
+                                        </select>
                                 </div>
 
                                 <div className="flex items-center mt-6">
@@ -88,12 +97,21 @@ export default function Create() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">Keywords</label>
-                                    <input type="text" value={data.keywords} onChange={e => setData('keywords', e.target.value)} placeholder="ex: masini, sport, 2026" className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
+                                    <input type="text" value={data.keywords} onChange={e => setData('keywords', e.target.value)} placeholder="ex: cars, sport, 2026" className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
                                 </div>
 
                                 <div>
                                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">Robots</label>
-                                    <input type="text" value={data.robots} onChange={e => setData('robots', e.target.value)} placeholder="ex: index, follow" className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border" />
+                                        <select 
+                                            value={data.robots} 
+                                            onChange={e => setData('robots', e.target.value)}
+                                            className="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md shadow-sm p-2 border"
+                                        >
+                                            <option value="index, follow">Index, Follow </option>
+                                            <option value="noindex, follow">NoIndex, Follow </option>
+                                            <option value="index, nofollow">Index, NoFollow </option>
+                                            <option value="noindex, nofollow">NoIndex, NoFollow </option>
+                                        </select>
                                 </div>
                             </div>
                         </div>
