@@ -6,6 +6,8 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\BlogController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -29,6 +31,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('categories', CategoryController::class)->middleware('can:view categories');
 
+    Route::resource('posts', PostController::class)->middleware('can:view posts');
+
+    
+
 });
+
+    Route::get('/', [BlogController::class, 'index'])->name('home'); 
+    Route::get('/article/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 require __DIR__.'/settings.php';

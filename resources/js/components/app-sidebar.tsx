@@ -1,5 +1,5 @@
 import { Link , usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, FileText, Globe } from 'lucide-react';
 //import { index } from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -50,7 +50,13 @@ export function AppSidebar() {
             href: dashboard(),
             icon: LayoutGrid,
         },
+        {       
+            title: 'View Public Site',
+            href: '/',
+            icon: Globe,
+        },
     ];
+    
 
     
     if (userPermissions.includes('manage users')) {
@@ -74,6 +80,14 @@ export function AppSidebar() {
             title: 'Roles & Permissions',
             href: '/roles',
             icon: LayoutGrid,
+        });
+    }
+
+    if (userPermissions.includes('view posts')) {
+        mainNavItems.push({       
+            title: 'Posts',
+            href: '/posts',
+            icon: FileText, 
         });
     }
 
