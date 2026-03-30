@@ -94,7 +94,7 @@ export default function Index({ posts }: IndexProps) {
                                                     <span className="text-xs text-gray-400 italic">Uncategorized</span>
                                                 ) : (
                                                     post.categories.map((cat) => (
-                                                        <span key={cat.id} className="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-semibold rounded-md">
+                                                        <span key={cat.id} className="px-2 py-1 bg-purple-300 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-semibold rounded-md">
                                                             {cat.title}
                                                         </span>
                                                     ))

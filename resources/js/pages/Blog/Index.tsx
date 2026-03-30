@@ -1,7 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
 
-// Structurile datelor
 interface Category {
     id: number;
     title: string;
@@ -32,14 +31,12 @@ export default function Index({ posts }: BlogIndexProps) {
         <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-blue-500 selection:text-white">
             <Head title="Welcome to My Blog" />
 
-            {/* Bara de navigare publică (Header) */}
             <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold text-white tracking-tight hover:text-blue-400 transition-colors">
                         My<span className="text-blue-500">Blog</span>.
                     </Link>
                     <nav>
-                        {/* Link către panoul de admin dacă ești logat, sau login dacă nu ești */}
                         <Link href="/dashboard" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
                             Admin Panel / Login
                         </Link>
@@ -47,7 +44,6 @@ export default function Index({ posts }: BlogIndexProps) {
                 </div>
             </header>
 
-            {/* Conținutul Principal */}
             <main className="max-w-6xl mx-auto px-6 py-12">
                 <div className="text-center mb-16">
                     <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
@@ -58,7 +54,6 @@ export default function Index({ posts }: BlogIndexProps) {
                     </p>
                 </div>
 
-                {/* Grila cu Articole */}
                 {posts.length === 0 ? (
                     <div className="text-center py-20 bg-slate-800/50 rounded-2xl border border-slate-700">
                         <h2 className="text-2xl text-slate-300 font-semibold mb-2">No articles yet.</h2>
@@ -69,7 +64,6 @@ export default function Index({ posts }: BlogIndexProps) {
                         {posts.map((post) => (
                             <article key={post.id} className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] flex flex-col group">
                                 
-                                {/* O imagine falsă/placeholder ca să arate bine */}
                                 <Link href={`/article/${post.slug}`} className="block h-48 bg-slate-700 overflow-hidden relative">
                                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 group-hover:scale-105 transition-transform duration-500"></div>
                                     <div className="absolute inset-0 flex items-center justify-center">
@@ -78,7 +72,6 @@ export default function Index({ posts }: BlogIndexProps) {
                                 </Link>
 
                                 <div className="p-6 flex flex-col flex-grow">
-                                    {/* Categoriile deasupra titlului */}
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {post.categories.map(cat => (
                                             <span key={cat.id} className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">
@@ -87,19 +80,16 @@ export default function Index({ posts }: BlogIndexProps) {
                                         ))}
                                     </div>
 
-                                    {/* Titlul */}
                                     <Link href={`/article/${post.slug}`}>
                                         <h2 className="text-2xl font-bold text-white mb-3 line-clamp-2 group-hover:text-blue-400 transition-colors leading-tight">
                                             {post.title}
                                         </h2>
                                     </Link>
 
-                                    {/* Extrasul */}
                                     <p className="text-slate-400 mb-6 line-clamp-3 text-sm flex-grow">
                                         {post.excerpt || post.content.substring(0, 120) + '...'}
                                     </p>
 
-                                    {/* Autor & Dată */}
                                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-xs font-bold text-white border border-slate-500">

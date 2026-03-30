@@ -6,12 +6,23 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use App\Http\Requests\StoreCategoryRequest;   
+use App\Http\Requests\UpdateCategoryRequest;  
+use App\Services\CategoryService;             
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
         $categories = Category::all();
@@ -32,36 +43,11 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
         
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:categories', 
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-            'template' => 'nullable|string|max:255',
-            'meta_descriptions' => 'nullable|string|max:255',
-            'keywords' => 'nullable|string|max:255',
-            'robots' => 'nullable|string|max:255',
-        ]);
+        $this->categoryService->createCategory($request->validated());
 
-        
-        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
-        
-        Category::create([
-            'title' => $request->title,
-            'slug' => $slug,
-            'description' => $request->description,
-            'is_active' => $request->is_active ?? true,
-            'template' => $request->template,
-            'meta_descriptions' => $request->meta_descriptions,
-            'keywords' => $request->keywords,
-            'robots' => $request->robots,
-        ]);
-
-        
         return redirect()->route('categories.index');
     }
 
@@ -86,31 +72,9 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:categories,slug,' . $category->id,
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-            'template' => 'nullable|string|max:255',
-            'meta_descriptions' => 'nullable|string|max:255',
-            'keywords' => 'nullable|string|max:255',
-            'robots' => 'nullable|string|max:255',
-        ]);
-
-        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
-        $category->update([
-            'title' => $request->title,
-            'slug' => $slug,
-            'description' => $request->description,
-            'is_active' => $request->is_active ?? true,
-            'template' => $request->template,
-            'meta_descriptions' => $request->meta_descriptions,
-            'keywords' => $request->keywords,
-            'robots' => $request->robots,
-        ]);
+        $this->categoryService->updateCategory($category, $request->validated());
 
         return redirect()->route('categories.index');
     }
@@ -120,7 +84,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $category->delete();
+        Gate::authorize('delete', $category);
+        $this->categoryService->deleteCategory($category);
         return redirect()->back();
     }
 }

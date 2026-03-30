@@ -2,13 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRoleRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Http\Requests\UpdateRoleRequest;  
+use App\Services\RoleService;             
+use Illuminate\Support\Facades\Gate;
 
 class RoleController extends Controller
 {
+    protected $roleService;
+
+    public function __construct(RoleService $roleService) 
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -36,20 +47,9 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|unique:roles,name', 
-            'permissions' => 'nullable|array' 
-        ]);
-
-        
-        $role = Role::create(['name' => $request->name]);
-
-        
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        }
+        $this->roleService->createRole($request->validated());
 
         return redirect()->route('roles.index');
     }
@@ -69,7 +69,6 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
         
-        // Încărcăm permisiunile curente ale acestui rol ca să apară bifate în formular
         $role->load('permissions');
 
         return Inertia::render('Roles/Edit', [
@@ -81,20 +80,9 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $role->id,
-            'permissions' => 'nullable|array'
-        ]);
-
-        $role->update(['name' => $request->name]);
-
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        } else {
-            $role->syncPermissions([]);
-        }
+        $this->roleService->updateRole($role, $request->validated());
 
         return redirect()->route('roles.index');
     }
@@ -104,11 +92,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        if ($role->name === 'Admin') {
-            return redirect()->back(); 
-        }
-
-        $role->delete();
+        Gate::authorize('delete', $role);
+        $this->roleService->deleteRole($role);
         return redirect()->back();
     }
 }

@@ -101,7 +101,7 @@ export default function Create({ categories }: CreateProps) {
                         </div>
 
                         <div>
-                            <label className="block text-slate-300 font-bold mb-2">Excerpt (Short Summary)</label>
+                            <label className="block text-slate-300 font-bold mb-2">Short Summary</label>
                             <textarea 
                                 value={data.excerpt} 
                                 onChange={e => setData('excerpt', e.target.value)} 

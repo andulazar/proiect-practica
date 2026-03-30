@@ -71,7 +71,7 @@ export default function Show({ post }: ShowProps) {
             </main>
 
             <footer className="border-t border-slate-800 mt-20 py-8 text-center text-slate-500">
-                <p>© {new Date().getFullYear()} MyBlog. Toate drepturile rezervate.</p>
+                <p>© {new Date().getFullYear()} MyBlog.</p>
             </footer>
         </div>
     );

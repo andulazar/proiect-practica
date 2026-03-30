@@ -6,12 +6,22 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use App\Http\Requests\StoreUserRequest;   
+use App\Http\Requests\UpdateUserRequest;  
+use App\Services\UserService;             
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    protected $userService;
+
+    public function __construct(UserService $userService) 
+    {
+        $this->userService = $userService;
+    }
     public function index()
     {
         // Fetch all users along with their assigned roles from the database
@@ -43,22 +53,9 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
-
-        //crearea util
-        $user=User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password), // criptam
-        ]);
-
-        $user->assignRole($request->role);
+        $this->userService->createUser($request->validated());
         return redirect()->route('users.index');
     }
 
@@ -73,11 +70,10 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        $user = User::with('roles')->findOrFail($id); 
+        $user->load('roles');
         
-        // 2. Luăm toate rolurile posibile pentru lista derulantă
         $roles = Role::all(); 
 
         return Inertia::render('Users/Edit', [
@@ -89,29 +85,9 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-       $user = User::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8', 
-            'role' => 'required|string|exists:roles,name', 
-        ]);
-
-        
-        $user->name = $request->name;
-        $user->email = $request->email;
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-        }
-
-        $user->save();
-
-        
-        $user->syncRoles([$request->role]);
+        $this->userService->updateUser($user, $request->validated());
 
         return redirect()->route('users.index');
     }
@@ -119,10 +95,10 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        $user=User::findOrFail($id);
-        $user->delete();
+        Gate::authorize('delete', $user);
+        $this->userService->deleteUser($user);
         return redirect()->back();
     }
 }

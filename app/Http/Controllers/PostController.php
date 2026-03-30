@@ -2,17 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use App\Services\PostService;
+use App\Policies\PostPolicy;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    protected $postService;
+    
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index()
     {
         $posts = Post::with(['author', 'categories'])->latest()->get();
@@ -36,34 +47,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:posts,slug',
-            'content' => 'required|string',
-            'excerpt' => 'nullable|string',
-            'category_ids' => 'required|array',
-            'is_published' => 'boolean',
-        ]);
 
-        
-        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
-        $post = Post::create([
-            'title' => $request->title,
-            'slug' => $slug,
-            'content' => $request->content,
-            'excerpt' => $request->excerpt,
-            'user_id' => \Illuminate\Support\Facades\Auth::id(), 
-            'is_published' => $request->is_published ?? false,
-            'meta_description' => $request->meta_description,
-            'keywords' => $request->keywords,
-            'robots' => $request->robots ?? 'index, follow',
-        ]);
-
-        
-        $post->categories()->sync($request->category_ids);
+        $this->postService->createPost($request->validated());
 
         return redirect()->route('posts.index');
     }
@@ -92,31 +79,10 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(StorePostRequest $request, Post $post)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:posts,slug,' . $post->id,
-            'content' => 'required|string',
-            'excerpt' => 'nullable|string',
-            'category_ids' => 'required|array',
-            'is_published' => 'boolean',
-        ]);
 
-        $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
-        $post->update([
-            'title' => $request->title,
-            'slug' => $slug,
-            'content' => $request->content,
-            'excerpt' => $request->excerpt,
-            'is_published' => $request->is_published ?? false,
-            'meta_description' => $request->meta_description,
-            'keywords' => $request->keywords,
-            'robots' => $request->robots ?? 'index, follow',
-        ]);
-
-        $post->categories()->sync($request->category_ids);
+        $this->postService->updatePost($post,$request->validated());
 
         return redirect()->route('posts.index');
     }
@@ -125,8 +91,9 @@ class PostController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(Post $post)
-    {
-        $post->delete();
+    {   
+        Gate::authorize('delete', $post);
+        $this->postService->deletePost($post);
         return redirect()->back();
     }
 }
