@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 use App\Http\Requests\StoreCategoryRequest;   
 use App\Http\Requests\UpdateCategoryRequest;  
 use App\Services\CategoryService;             
@@ -25,8 +23,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all();
-        
+        $categories = $this->categoryService->getAllCategories(); 
+               
         return Inertia::render('Categories/Index', [
             'categories' => $categories
         ]);
@@ -48,7 +46,8 @@ class CategoryController extends Controller
         
         $this->categoryService->createCategory($request->validated());
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')
+                         ->with('success', 'Category created!');
     }
 
     /**
@@ -76,7 +75,8 @@ class CategoryController extends Controller
     {
         $this->categoryService->updateCategory($category, $request->validated());
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')
+                          ->with('success', 'Category updated!');
     }
 
     /**
@@ -86,6 +86,7 @@ class CategoryController extends Controller
     {
         Gate::authorize('delete', $category);
         $this->categoryService->deleteCategory($category);
-        return redirect()->back();
+        return redirect()->back()
+                            ->with('success', 'Category deleted!');
     }
 }

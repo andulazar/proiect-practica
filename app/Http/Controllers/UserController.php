@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;   
@@ -24,13 +23,9 @@ class UserController extends Controller
     }
     public function index()
     {
-        // Fetch all users along with their assigned roles from the database
-        $users = User::with('roles')->get();
-
-        // Fetch all available roles to populate dropdown menus later
+        $users = $this->userService->getAllUsers();
         $roles = Role::all();
 
-        // Render the React component (Users/Index) and pass the data to it
         return Inertia::render('Users/Index', [
             'users' => $users,
             'roles' => $roles
@@ -56,7 +51,8 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $this->userService->createUser($request->validated());
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')
+                         ->with('success', 'User created!');
     }
 
     /**
@@ -89,7 +85,8 @@ class UserController extends Controller
     {
         $this->userService->updateUser($user, $request->validated());
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')
+                         ->with('success', 'User updated!');
     }
 
     /**
@@ -97,8 +94,10 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        
         Gate::authorize('delete', $user);
         $this->userService->deleteUser($user);
-        return redirect()->back();
+        return redirect()->back()
+                         ->with('success', 'User deleted!') ;
     }
 }

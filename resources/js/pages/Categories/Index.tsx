@@ -1,8 +1,16 @@
-import { Head, router, Link } from '@inertiajs/react';
-import React from 'react';
+import { Head, router, Link, usePage } from '@inertiajs/react'; 
+import React, { useState, useEffect } from 'react';
+import Pagination from '@/components/Pagination'; 
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
+interface CustomPageProps {
+    flash: {
+        success?: string;
+        error?: string;
+    };
+    [key: string]: unknown;
+}
 
 interface Category {
     id: number;
@@ -14,8 +22,17 @@ interface Category {
 }
 
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
 interface IndexProps {
-    categories: Category[];
+    categories: {
+        data: Category[];
+        links: PaginationLink[];
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,10 +41,37 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ categories }: IndexProps) {
+
+    const { flash } = usePage<CustomPageProps>().props;
+            const [showPopup, setShowPopup] = useState(false);
+        
+            useEffect(() => {
+                if (flash && (flash.success || flash.error)) {
+                    const showTimer = setTimeout(() => setShowPopup(true), 0);
+                    const hideTimer = setTimeout(() => setShowPopup(false), 3000);
+                    
+                    return () => {
+                        clearTimeout(showTimer);
+                        clearTimeout(hideTimer);
+                    };
+                }
+            }, [flash]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manage Categories" />
-            
+
+            {showPopup && flash?.success && (
+                <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg transition-all">
+                    {flash.success}
+                </div>
+            )}
+            {showPopup && flash?.error && (
+                <div className="fixed top-5 right-5 z-50 bg-red-600 text-white px-6 py-3 rounded-md shadow-lg transition-all">
+                    {flash.error}
+                </div>
+            )}
+
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
                 <div className="max-w-7xl mx-auto">
                     
@@ -59,7 +103,7 @@ export default function Index({ categories }: IndexProps) {
                             </thead>
                             <tbody>
                                 
-                                {categories.length === 0 && (
+                                {categories.data.length === 0 && (
                                     <tr>
                                         <td colSpan={5} className="p-8 text-center text-gray-500 dark:text-gray-400">
                                             No categories at the moment.Press the button above to add one.
@@ -68,7 +112,7 @@ export default function Index({ categories }: IndexProps) {
                                 )}
 
                                 
-                                {categories.map((category) => (
+                                {categories.data.map((category) => (
                                     <tr key={category.id} className="border-b dark:border-gray-700 hover:bg-gray-600 dark:hover:bg-gray-750">
                                         <td className="p-4 text-gray-800 dark:text-gray-300">{category.id}</td>
                                         <td className="p-4 text-gray-800 dark:text-gray-300 font-medium">{category.title}</td>
@@ -111,6 +155,7 @@ export default function Index({ categories }: IndexProps) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination links={categories.links} />
                 </div>
             </div>
         </AppLayout>

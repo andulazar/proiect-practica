@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 class RoleRepository implements RoleInterface
 {
     public function getAllRoles(){
-            return  Role::with('permissions')->get();
+            return  Role::with('permissions')->paginate(10);
     }
 
     public function createRole(array $data){

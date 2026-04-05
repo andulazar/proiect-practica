@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Interfaces\CategoryInterface;        
 use Illuminate\Support\Str;              
-use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
 
 
@@ -15,6 +14,11 @@ class CategoryService {
     public function __construct(CategoryInterface $categoryInterface) 
     {
         $this->categoryInterface = $categoryInterface;
+    }
+
+    public function getAllCategories()
+    {
+        return $this->categoryInterface->getAllCategories();
     }
 
     public function createCategory(array $validatedData)

@@ -9,7 +9,7 @@ class UserRepository implements UserInterface
 {
     public function getAllUsers()
     {
-        return User::with('roles')->get();
+        return User::with('roles')->paginate(10); 
     }
 
     public function createUser(array $data)

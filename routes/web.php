@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogController;
+use App\Models\User;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -39,5 +40,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', [BlogController::class, 'index'])->name('home'); 
     Route::get('/article/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+    Route::get('/generate-token-secret', function () {
+    $user = User::first();
+    
+    $user->tokens()->delete();
+
+    $token = $user->createToken('my-phone')->plainTextToken;
+
+    return "Hey {$user->name}! copy this token: " . $token;
+});
 
 require __DIR__.'/settings.php';

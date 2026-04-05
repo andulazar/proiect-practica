@@ -7,9 +7,9 @@ use App\Models\Post;
 
 class PostRepository implements PostInterface
 {
-    public function getAllPosts() 
+    public function getAllPosts()
     {
-        return Post::all(); 
+        return Post::with(['author', 'categories'])->latest()->paginate(10);
     }
 
     public function createPost(array $data) 
@@ -19,6 +19,7 @@ class PostRepository implements PostInterface
         
         return $post;
     }
+    
 
     public function updatePost(Post $post, array $data) 
     {

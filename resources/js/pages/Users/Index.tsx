@@ -1,10 +1,19 @@
 
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, router, Link, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import Pagination from '@/components/Pagination'; 
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
 
+interface CustomPageProps {
+    flash: {
+        success?: string;
+        error?: string;
+    };
+    [key: string]: unknown; 
+}
 interface Role {
     id: number;
     name: string;
@@ -17,9 +26,19 @@ interface User {
     roles?: Role[]; 
 }
 
-interface IndexProps {
-    users: User[];
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
 }
+
+interface IndexProps {
+    users: {
+        data: User[];
+        links: PaginationLink[]; 
+    };
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -28,10 +47,36 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ users }: IndexProps) {
+    const { flash } = usePage<CustomPageProps>().props;
+    const [showPopup, setShowPopup] = useState(false);
+
+    useEffect(() => {
+        if (flash && (flash.success || flash.error)) {
+            const showTimer = setTimeout(() => setShowPopup(true), 0);
+            const hideTimer = setTimeout(() => setShowPopup(false), 3000);
+            
+            return () => {
+                clearTimeout(showTimer);
+                clearTimeout(hideTimer);
+            };
+        }
+    }, [flash]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
                     <Head title="Manage Users" />
-                    
+
+            {showPopup && flash?.success && (
+                <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg transition-all">
+                    {flash.success}
+                </div>
+            )}
+            {showPopup && flash?.error && (
+                <div className="fixed top-5 right-5 z-50 bg-red-600 text-white px-6 py-3 rounded-md shadow-lg transition-all">
+                    {flash.error}
+                </div>
+            )}
+
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
             
             
@@ -60,7 +105,7 @@ export default function Index({ users }: IndexProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user: User) => (
+                        {users.data.map((user: User) => (
                             <tr key={user.id} className="border-b dark:border-gray-700 hover:bg-gray-600 dark:hover:bg-gray-750">
                                 <td className="p-4 text-gray-800 dark:text-gray-300">{user.id}</td>
                                 <td className="p-4 text-gray-800 dark:text-gray-300 font-medium">{user.name}</td>
@@ -98,6 +143,7 @@ export default function Index({ users }: IndexProps) {
                     </tbody>
                 </table>
             </div>
+            <Pagination links={users.links} />
         </div>
     </AppLayout>
     );

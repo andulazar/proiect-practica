@@ -10,7 +10,13 @@ class RoleService
 
     public function __construct(RoleInterface $roleInterface) 
     {
+        //dd($roleInterface);
         $this->roleInterface = $roleInterface;
+        
+    }
+    public function getAllRoles()
+    {
+        return $this->roleInterface->getAllRoles();
     }
 
     public function createRole(array $validatedData)

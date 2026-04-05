@@ -17,6 +17,11 @@ class PostService {
         $this->postInterface = $postInterface;
     }
 
+    public function getAllPosts()
+    {
+        return $this->postInterface->getAllPosts();
+    }
+
     public function createPost(array $validatedData) {
         $slug = $validatedData['slug'] 
             ? Str::slug($validatedData['slug']) 

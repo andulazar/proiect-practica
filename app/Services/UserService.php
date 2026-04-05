@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Interfaces\UserInterface;        
-use Illuminate\Support\Str;              
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 
@@ -14,6 +12,10 @@ class UserService {
     public function __construct(UserInterface $userInterface) 
     {
         $this->userInterface = $userInterface;
+    }
+    public function getAllUsers()
+    {
+        return User::with('roles')->paginate(10);
     }
 
     public function createUser(array $validatedData)

@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use App\Models\Category;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 use App\Services\PostService;
-use App\Policies\PostPolicy;
 use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
@@ -26,11 +23,11 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = Post::with(['author', 'categories'])->latest()->get();
+        $posts = $this->postService->getAllPosts();
 
         return Inertia::render('Posts/Index', [
-            'posts' => $posts
-        ]);
+        'posts' => $posts 
+    ]);
     }
 
     /**
@@ -52,7 +49,8 @@ class PostController extends Controller
 
         $this->postService->createPost($request->validated());
 
-        return redirect()->route('posts.index');
+        return redirect()->route('posts.index')
+                            ->with('success', 'Post created!');
     }
 
     /**
@@ -84,7 +82,8 @@ class PostController extends Controller
 
         $this->postService->updatePost($post,$request->validated());
 
-        return redirect()->route('posts.index');
+        return redirect()->route('posts.index')
+                            ->with('success', 'Post updated!');
     }
 
     /**
@@ -94,6 +93,7 @@ class PostController extends Controller
     {   
         Gate::authorize('delete', $post);
         $this->postService->deletePost($post);
-        return redirect()->back();
+        return redirect()->back()
+                            ->with('success', 'Post deleted!');
     }
 }

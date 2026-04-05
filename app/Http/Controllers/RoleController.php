@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRoleRequest;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -20,13 +19,19 @@ class RoleController extends Controller
         $this->roleService = $roleService;
     }
 
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $roles = Role::with('permissions')->get();
-        
+        //new \App\Interfaces\RoleInterface();
+        //dd( new \App\Interfaces\RoleInterface());
+
+
+        $roles = $this->roleService->getAllRoles();    
+            
         return Inertia::render('Roles/Index', [
             'roles' => $roles
         ]);
@@ -51,7 +56,8 @@ class RoleController extends Controller
     {
         $this->roleService->createRole($request->validated());
 
-        return redirect()->route('roles.index');
+        return redirect()->route('roles.index')
+                         ->with('success', 'Role created!');
     }
 
     /**
@@ -84,7 +90,8 @@ class RoleController extends Controller
     {
         $this->roleService->updateRole($role, $request->validated());
 
-        return redirect()->route('roles.index');
+        return redirect()->route('roles.index')
+                        ->with('success', 'Role updated!');
     }
 
     /**
@@ -92,8 +99,13 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        if ($role->name === 'Admin') {
+            return redirect()->back()
+                             ->with('error', 'Error: Admin cannot be deleted!');
+        }
         Gate::authorize('delete', $role);
         $this->roleService->deleteRole($role);
-        return redirect()->back();
+        return redirect()->back()
+                        ->with('success', 'Role deleted!');
     }
 }
