@@ -17,6 +17,7 @@ interface Post {
     slug: string;
     content: string; 
     excerpt: string | null;
+    cover_image: string | null; 
     author: User;
     categories: Category[];
     created_at: string;
@@ -27,6 +28,12 @@ interface BlogIndexProps {
 }
 
 export default function Index({ posts }: BlogIndexProps) {
+    const stripHtml = (html: string) => {
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    };
+
     return (
         <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-blue-500 selection:text-white">
             <Head title="Welcome to My Blog" />
@@ -65,10 +72,20 @@ export default function Index({ posts }: BlogIndexProps) {
                             <article key={post.id} className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] flex flex-col group">
                                 
                                 <Link href={`/article/${post.slug}`} className="block h-48 bg-slate-700 overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 group-hover:scale-105 transition-transform duration-500"></div>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-slate-500 font-bold text-2xl opacity-20">{post.title}</span>
-                                    </div>
+                                    {post.cover_image ? (
+                                        <img 
+                                            src={`/storage/${post.cover_image}`} 
+                                            alt={post.title} 
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <>
+                                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 group-hover:scale-105 transition-transform duration-500"></div>
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <span className="text-slate-500 font-bold text-2xl opacity-20">{post.title}</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </Link>
 
                                 <div className="p-6 flex flex-col flex-grow">
@@ -87,7 +104,7 @@ export default function Index({ posts }: BlogIndexProps) {
                                     </Link>
 
                                     <p className="text-slate-400 mb-6 line-clamp-3 text-sm flex-grow">
-                                        {post.excerpt || post.content.substring(0, 120) + '...'}
+                                        {post.excerpt || stripHtml(post.content).substring(0, 120) + '...'}
                                     </p>
 
                                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">

@@ -16,6 +16,7 @@ interface Post {
     title: string;
     slug: string;
     content: string;
+    cover_image: string | null; 
     author: User;
     categories: Category[];
     created_at: string;
@@ -64,9 +65,20 @@ export default function Show({ post }: ShowProps) {
                         </div>
                     </div>
 
-                    <div className="text-lg leading-relaxed text-slate-300 whitespace-pre-wrap">
-                        {post.content}
-                    </div>
+                    {post.cover_image && (
+                        <div className="mb-12 rounded-2xl overflow-hidden border border-slate-700 shadow-lg">
+                            <img 
+                                src={`/storage/${post.cover_image}`} 
+                                alt={post.title} 
+                                className="w-full h-auto object-cover max-h-[500px]"
+                            />
+                        </div>
+                    )}
+
+                    <div 
+                        className="text-lg leading-relaxed text-slate-300 [&>p]:mb-6 [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-white [&>h1]:mb-4 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
                 </article>
             </main>
 

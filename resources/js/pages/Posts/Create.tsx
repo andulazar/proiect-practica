@@ -1,7 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import React from 'react';
+import React, { useState } from 'react';
+import ReactQuill from 'react-quill-new';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import 'react-quill-new/dist/quill.snow.css';
 
 interface Category {
     id: number;
@@ -29,7 +31,18 @@ export default function Create({ categories }: CreateProps) {
         meta_description: '',
         keywords: '',
         robots: 'index, follow',
+        cover_image: null as File | null, 
     });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('cover_image', file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const categoryId = parseInt(e.target.value);
@@ -59,7 +72,6 @@ export default function Create({ categories }: CreateProps) {
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         
-                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-slate-300 font-bold mb-2">Title *</label>
@@ -86,17 +98,49 @@ export default function Create({ categories }: CreateProps) {
                             </div>
                         </div>
 
-                        
+                        <div className="mt-6 mb-6">
+                            <label className="block text-slate-300 font-bold mb-2">Cover Image (Optional)</label>
+                            <div className="flex items-center justify-center w-full">
+                                <label 
+                                    htmlFor="dropzone-file" 
+                                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-slate-600 border-dashed rounded-lg cursor-pointer bg-slate-900/50 hover:bg-slate-800 transition-colors relative overflow-hidden"
+                                >
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-70 hover:opacity-50 transition-opacity" />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg className="w-10 h-10 mb-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                            </svg>
+                                            <p className="mb-2 text-sm text-slate-400"><span className="font-bold text-blue-500">Click to upload</span> or drag and drop</p>
+                                            <p className="text-xs text-slate-500">PNG, JPG, WEBP or GIF (MAX. 2MB)</p>
+                                        </div>
+                                    )}
+                                    <input 
+                                        id="dropzone-file" 
+                                        type="file" 
+                                        className="hidden" 
+                                        accept="image/*" 
+                                        onChange={handleImageChange} 
+                                    />
+                                </label>
+                            </div>
+                            {errors.cover_image && <div className="text-red-500 text-sm mt-2">{errors.cover_image}</div>}
+                        </div>
+
                         <div>
                             <label className="block text-slate-300 font-bold mb-2">Article Content *</label>
-                            <textarea 
-                                value={data.content} 
-                                onChange={e => setData('content', e.target.value)} 
-                                rows={10}
-                                placeholder="Write your amazing article here..."
-                                className="w-full bg-slate-900 text-white rounded-md p-3 border border-slate-600 focus:border-blue-500 focus:ring-blue-500" 
-                                required 
-                            ></textarea>
+                            
+                            <div className="quill-dark text-white rounded-md overflow-hidden mb-2 border border-slate-700">
+                                <ReactQuill 
+                                    theme="snow" 
+                                    value={data.content} 
+                                    onChange={(value) => setData('content', value)} 
+                                    placeholder="Write your amazing article here..."
+                                    className="h-64 pb-12" 
+                                />
+                            </div>
+
                             {errors.content && <div className="text-red-500 text-sm mt-1">{errors.content}</div>}
                         </div>
 
@@ -112,7 +156,6 @@ export default function Create({ categories }: CreateProps) {
                             {errors.excerpt && <div className="text-red-500 text-sm mt-1">{errors.excerpt}</div>}
                         </div>
 
-                        
                         <div className="p-5 border border-slate-700 rounded-md bg-slate-900/50">
                             <h2 className="text-xl font-bold text-white mb-4">Select Categories *</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -143,7 +186,6 @@ export default function Create({ categories }: CreateProps) {
                             {errors.category_ids && <div className="text-red-500 text-sm mt-2">{errors.category_ids}</div>}
                         </div>
 
-                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 border border-slate-700 rounded-md bg-slate-900/50">
                             <div className="space-y-4">
                                 <h2 className="text-xl font-bold text-white mb-2">SEO Settings</h2>
@@ -206,4 +248,4 @@ export default function Create({ categories }: CreateProps) {
             </div>
         </AppLayout>
     );
-} 
+}

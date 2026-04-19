@@ -141,3 +141,32 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+.quill-dark .ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid #334155; 
+    background-color: #1e293b; 
+}
+
+.quill-dark .ql-container.ql-snow {
+    border: none;
+    background-color: #0f172a; 
+    color: #f8fafc; 
+}
+
+.quill-dark .ql-snow .ql-stroke {
+    stroke: #cbd5e1;
+}
+.quill-dark .ql-snow .ql-fill, 
+.quill-dark .ql-snow .ql-stroke.ql-fill {
+    fill: #cbd5e1;
+}
+.quill-dark .ql-snow .ql-picker {
+    color: #cbd5e1;
+}
+
+.quill-dark .ql-snow .ql-picker-options {
+    background-color: #1e293b; 
+    border-color: #334155; 
+}

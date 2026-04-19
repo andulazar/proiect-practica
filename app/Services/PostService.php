@@ -6,7 +6,8 @@ use App\Interfaces\PostInterface;
 use Illuminate\Support\Str;              
 use Illuminate\Support\Facades\Auth;
 use App\Models\Post;
-
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class PostService {
 
@@ -23,12 +24,18 @@ class PostService {
     }
 
     public function createPost(array $validatedData) {
-        $slug = $validatedData['slug'] 
+        $slug = !empty($validatedData['slug']) 
             ? Str::slug($validatedData['slug']) 
             : Str::slug($validatedData['title']);
 
         $validatedData['slug'] = $slug;
         $validatedData['user_id'] = Auth::id();
+
+        if (isset($validatedData['cover_image']) && $validatedData['cover_image'] instanceof UploadedFile) {
+            $path = $validatedData['cover_image']->store('posts', 'public');
+            
+            $validatedData['cover_image'] = $path;
+        }
 
         return $this->postInterface->createPost($validatedData);
     }
@@ -41,11 +48,25 @@ class PostService {
 
         $validatedData['slug'] = $slug;
 
+        if (isset($validatedData['cover_image']) && $validatedData['cover_image'] instanceof UploadedFile) {
+            
+            if ($post->cover_image) {
+                Storage::disk('public')->delete($post->cover_image);
+            }
+            
+            $path = $validatedData['cover_image']->store('posts', 'public');
+            $validatedData['cover_image'] = $path;
+        }
+
         return $this->postInterface->updatePost($post, $validatedData);
     }
 
     public function deletePost(Post $post) 
     {
+        if ($post->cover_image) {
+            Storage::disk('public')->delete($post->cover_image);
+        }
+
         return $this->postInterface->deletePost($post);
     }
 }

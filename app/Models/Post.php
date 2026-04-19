@@ -19,6 +19,7 @@ class Post extends Model
         'meta_description',
         'keywords',
         'robots',
+        'cover_image',
     ];
 
     public function categories()
