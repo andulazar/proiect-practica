@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Post;
+//use App\Models\Post;
+
 
 
 Route::post('/login', function (Request $request) {
@@ -33,17 +34,38 @@ Route::post('/login', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    Route::get('/posts', function (Request $request) {
+    Route::get('/posts', function (Illuminate\Http\Request $request) {
+        $query = App\Models\Post::with(['author', 'categories'])->latest();
+
+        if ($request->filled('category')) {
+            $query->whereHas('categories', function($q) use ($request) {
+                $q->where('title', $request->category);
+            });
+        }
+
+        $perPage = $request->input('per_page', 6);
+
         return response()->json([
             'status' => 'success',
-            'message' => '50 articles!',
-            'data' => Post::with(['author', 'categories'])->latest()->paginate(50)
+            'data' => $query->paginate($perPage)
         ]);
     });
 
-    Route::post('/logout', function (Request $request) {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'You logged out succesfully. Token was destroyed!']);
+    Route::get('/categories', function () {
+        return response()->json([
+            'status' => 'success',
+            'data' => \App\Models\Category::all()
+        ]);
     });
 
-}); 
+    Route::get('/posts/{slug}', function ($slug) {
+        $post = App\Models\Post::with(['author', 'categories'])->where('slug', $slug)->firstOrFail();
+        return response()->json(['status' => 'success', 'data' => $post]);
+    });
+
+    Route::post('/logout', function (Illuminate\Http\Request $request) {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logged out!']);
+    });
+
+});
