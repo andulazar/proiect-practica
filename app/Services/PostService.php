@@ -35,6 +35,12 @@ class PostService {
             $path = $validatedData['cover_image']->store('posts', 'public');
             
             $validatedData['cover_image'] = $path;
+        } else {
+            unset($validatedData['cover_image']);
+        }
+
+        if (! Auth::user()?->can('publish posts')) {
+            $validatedData['is_published'] = false;
         }
 
         return $this->postInterface->createPost($validatedData);
@@ -56,6 +62,14 @@ class PostService {
             
             $path = $validatedData['cover_image']->store('posts', 'public');
             $validatedData['cover_image'] = $path;
+        } else {
+            // No new file uploaded: keep the existing cover image
+            unset($validatedData['cover_image']);
+        }
+
+        if (! Auth::user()?->can('publish posts')) {
+            // Users without the publish permission cannot change the published state
+            $validatedData['is_published'] = $post->is_published;
         }
 
         return $this->postInterface->updatePost($post, $validatedData);

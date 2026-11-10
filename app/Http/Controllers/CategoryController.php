@@ -7,10 +7,20 @@ use Inertia\Inertia;
 use App\Http\Requests\StoreCategoryRequest;   
 use App\Http\Requests\UpdateCategoryRequest;  
 use App\Services\CategoryService;             
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:create categories', only: ['create', 'store']),
+            new Middleware('can:edit categories', only: ['edit', 'update']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -23,7 +23,7 @@ class CategoryService {
 
     public function createCategory(array $validatedData)
     {
-        $slug = $validatedData['slug'] 
+        $slug = !empty($validatedData['slug']) 
             ? Str::slug($validatedData['slug']) 
             : Str::slug($validatedData['title']);
 

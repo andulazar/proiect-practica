@@ -36,15 +36,15 @@ class RolesAndPermissionsSeeder extends Seeder
 
         
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         
-        $adminRole = Role::create(['name' => 'Admin']);
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $adminRole->givePermissionTo(Permission::all());
 
         
-        $editorRole = Role::create(['name' => 'Editor']);
+        $editorRole = Role::firstOrCreate(['name' => 'Editor']);
         $editorRole->givePermissionTo([
             'view categories',
             'view posts',
@@ -53,6 +53,6 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
         
         
-        Role::create(['name' => 'User']);
+        Role::firstOrCreate(['name' => 'User']);
     }
 }
