@@ -23,11 +23,15 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:posts,slug,',
+            'slug' => 'nullable|string|max:255|unique:posts,slug',
             'content' => 'required|string',
             'excerpt' => 'nullable|string',
             'category_ids' => 'required|array',
+            'category_ids.*' => 'integer|exists:categories,id',
             'is_published' => 'boolean',
+            'meta_description' => 'nullable|string|max:255',
+            'keywords' => 'nullable|string|max:255',
+            'robots' => 'nullable|string|max:255',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];
     }

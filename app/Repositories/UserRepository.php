@@ -14,9 +14,7 @@ class UserRepository implements UserInterface
 
     public function createUser(array $data)
     {
-        // $category=User::create($data);
-        // return $category;
-        return User::with('roles')->get();
+        return User::create($data);
     }
 
     public function updateUser(User $user, array $data)

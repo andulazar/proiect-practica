@@ -35,7 +35,7 @@ Route::post('/login', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/posts', function (Illuminate\Http\Request $request) {
-        $query = App\Models\Post::with(['author', 'categories'])->latest();
+        $query = App\Models\Post::with(['author', 'categories'])->where('is_published', true)->latest();
 
         if ($request->filled('category')) {
             $query->whereHas('categories', function($q) use ($request) {
@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
             });
         }
 
-        $perPage = $request->input('per_page', 6);
+        $perPage = min((int) $request->input('per_page', 6), 50);
 
         return response()->json([
             'status' => 'success',
@@ -59,7 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/posts/{slug}', function ($slug) {
-        $post = App\Models\Post::with(['author', 'categories'])->where('slug', $slug)->firstOrFail();
+        $post = App\Models\Post::with(['author', 'categories'])->where('slug', $slug)->where('is_published', true)->firstOrFail();
         return response()->json(['status' => 'success', 'data' => $post]);
     });
 

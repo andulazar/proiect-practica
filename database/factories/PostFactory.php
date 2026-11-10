@@ -20,7 +20,7 @@ class PostFactory extends Factory
 
     public function definition(): array
     {
-        $title = $this->faker->sentence();
+        $title = $this->faker->unique()->sentence();
         return [
             'title' => $title,
             'slug' => Str::slug($title),

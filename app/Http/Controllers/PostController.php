@@ -3,14 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\Category;
 use Inertia\Inertia;
 use App\Services\PostService;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 
-class PostController extends Controller
+class PostController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:create posts', only: ['create', 'store']),
+            new Middleware('can:edit posts', only: ['edit', 'update']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -77,7 +88,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StorePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
 
         $this->postService->updatePost($post,$request->validated());
